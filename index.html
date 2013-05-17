@@ -6,6 +6,7 @@
 <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
 <script type="text/javascript" src="js/gl-matrix-min.js"></script>
 <script type="text/javascript" src="js/webgl-utils.js"></script>
+<script type="text/javascript" src="js/RectPrism.js"></script>
 
 <script id="shader-fs" type="x-shader/x-fragment">
     precision mediump float;
@@ -36,237 +37,6 @@
 
 
 <script type="text/javascript">
-
-	//Create some shape primitives
-	function RectPrism(width, height, depth, x, y, z, texture)
-	{
-		//Construct Buffers, setup objects
-		this.vertexBuffer = gl.createBuffer();
-		this.textureCoordBuffer = gl.createBuffer();
-		this.texture = texture;
-		this.vertexPositions = [];
-		this.vertexTextureCoords = [];
-		
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		
-		var w = width / 2;
-		var h = height / 2;
-		var d = depth / 2;
-		
-		this.vertexPositions.push(w + x, h + z, -d + y);
-		this.vertexPositions.push(w + x, h + z, d + y);
-		this.vertexPositions.push(-w + x, h + z, d + y);
-
-		this.vertexPositions.push(-w + x, h + z, d + y);
-		this.vertexPositions.push(-w + x, h + z, -d + y);
-		this.vertexPositions.push(w + x, h + z, -d + y);
-		
-		this.vertexTextureCoords.push(0.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 0.0);
-		
-		//Side A (front)
-		this.vertexPositions.push(w + x, h + z, d + y);
-		this.vertexPositions.push(w + x, h + z, -d + y);
-		this.vertexPositions.push(w + x, -h + z, -d + y);
-		
-		this.vertexPositions.push(w + x, -h + z, -d + y);
-		this.vertexPositions.push(w + x, -h + z, d + y);
-		this.vertexPositions.push(w + x, h + z, d + y);
-		
-		this.vertexTextureCoords.push(0.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 0.0);
-		
-		//Side B (back)
-		this.vertexPositions.push(-w + x, h + z, d + y);
-		this.vertexPositions.push(-w + x, h + z, -d + y);
-		this.vertexPositions.push(-w + x, -h + z, -d + y);
-		
-		this.vertexPositions.push(-w + x, -h + z, -d + y);
-		this.vertexPositions.push(-w + x, -h + z, d + y);
-		this.vertexPositions.push(-w + x, h + z, d + y);
-		
-		this.vertexTextureCoords.push(0.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 0.0);
-		
-		//Side C (left)
-		this.vertexPositions.push(w + x, h + z, d + y);
-		this.vertexPositions.push(w + x, -h + z, d + y);
-		this.vertexPositions.push(-w + x, -h + z, d + y);
-		
-		this.vertexPositions.push(-w + x, -h + z, d + y);
-		this.vertexPositions.push(-w + x, h + z, d + y);
-		this.vertexPositions.push(w + x, h + z, d + y);
-		
-		this.vertexTextureCoords.push(0.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 0.0);
-		
-		//Side D (right)
-		this.vertexPositions.push(w + x, h + z, -d + y);
-		this.vertexPositions.push(w + x, -h + z, -d + y);
-		this.vertexPositions.push(-w + x, -h + z, -d + y);
-		
-		this.vertexPositions.push(-w + x, -h + z, -d + y);
-		this.vertexPositions.push(-w + x, h + z, -d + y);
-		this.vertexPositions.push(w + x, h + z, -d + y);
-		
-		this.vertexTextureCoords.push(0.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 0.0);	
-		
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertexPositions), gl.DYNAMIC_DRAW);
-		this.vertexBuffer.itemSize = 3;
-		this.vertexBuffer.numItems = 30;
-	
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.textureCoordBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertexTextureCoords), gl.STATIC_DRAW);
-		this.textureCoordBuffer.itemSize = 2;
-		this.textureCoordBuffer.numItems = 30;
-	}
-	
-	RectPrism.prototype.animate = function() 
-	{
-		//Construct Buffers, setup objects
-		this.vertexPositions = [];
-		this.vertexTextureCoords = [];
-		
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		
-		var w = width / 2;
-		var h = height / 2;
-		var d = depth / 2;
-		
-		this.vertexPositions.push(w + x, h + z, -d + y);
-		this.vertexPositions.push(w + x, h + z, d + y);
-		this.vertexPositions.push(-w + x, h + z, d + y);
-
-		this.vertexPositions.push(-w + x, h + z, d + y);
-		this.vertexPositions.push(-w + x, h + z, -d + y);
-		this.vertexPositions.push(w + x, h + z, -d + y);
-		
-		this.vertexTextureCoords.push(0.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 0.0);
-		
-		//Side A (front)
-		this.vertexPositions.push(w + x, h + z, d + y);
-		this.vertexPositions.push(w + x, h + z, -d + y);
-		this.vertexPositions.push(w + x, -h + z, -d + y);
-		
-		this.vertexPositions.push(w + x, -h + z, -d + y);
-		this.vertexPositions.push(w + x, -h + z, d + y);
-		this.vertexPositions.push(w + x, h + z, d + y);
-		
-		this.vertexTextureCoords.push(0.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 0.0);
-		
-		//Side B (back)
-		this.vertexPositions.push(-w + x, h + z, d + y);
-		this.vertexPositions.push(-w + x, h + z, -d + y);
-		this.vertexPositions.push(-w + x, -h + z, -d + y);
-		
-		this.vertexPositions.push(-w + x, -h + z, -d + y);
-		this.vertexPositions.push(-w + x, -h + z, d + y);
-		this.vertexPositions.push(-w + x, h + z, d + y);
-		
-		this.vertexTextureCoords.push(0.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 0.0);
-		
-		//Side C (left)
-		this.vertexPositions.push(w + x, h + z, d + y);
-		this.vertexPositions.push(w + x, -h + z, d + y);
-		this.vertexPositions.push(-w + x, -h + z, d + y);
-		
-		this.vertexPositions.push(-w + x, -h + z, d + y);
-		this.vertexPositions.push(-w + x, h + z, d + y);
-		this.vertexPositions.push(w + x, h + z, d + y);
-		
-		this.vertexTextureCoords.push(0.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 0.0);
-		
-		//Side D (right)
-		this.vertexPositions.push(w + x, h + z, -d + y);
-		this.vertexPositions.push(w + x, -h + z, -d + y);
-		this.vertexPositions.push(-w + x, -h + z, -d + y);
-		
-		this.vertexPositions.push(-w + x, -h + z, -d + y);
-		this.vertexPositions.push(-w + x, h + z, -d + y);
-		this.vertexPositions.push(w + x, h + z, -d + y);
-		
-		this.vertexTextureCoords.push(0.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 1.0);
-		this.vertexTextureCoords.push(1.0, 0.0);
-		this.vertexTextureCoords.push(0.0, 0.0);	
-		
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertexPositions), gl.DYNAMIC_DRAW);
-		this.vertexBuffer.itemSize = 3;
-		this.vertexBuffer.numItems = 30;
-	
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.textureCoordBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertexTextureCoords), gl.STATIC_DRAW);
-		this.textureCoordBuffer.itemSize = 2;
-		this.textureCoordBuffer.numItems = 30;
-	}
-	
-	RectPrism.prototype.draw = function()
-	{	
-		if (this.textureCoordBuffer == null || this.vertexBuffer == null) {
-            return;
-        }
-		
-		gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-		gl.uniform1i(shaderProgram.samplerUniform, 0);
-		
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.textureCoordBuffer);
-        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, this.textureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
-		
-		gl.drawArrays(gl.TRIANGLES, 0, this.vertexBuffer.numItems);
-	}
 
 	var yHeight = 2;
     var gl;
@@ -598,10 +368,12 @@
 
     function animate() {
         var timeNow = new Date().getTime();
-        if (lastTime != 0) {
+		
+        if (lastTime != 0) 
+		{
             var elapsed = timeNow - lastTime;
-
-            if (speed != 0 || strafe != 0) {
+            if (speed != 0 || strafe != 0) 
+			{
                 xPos -= Math.sin(degToRad(yaw)) * speed * elapsed; //Pressing forward button
                 zPos -= Math.cos(degToRad(yaw)) * speed * elapsed;
 				
@@ -611,7 +383,11 @@
 
             yaw += yawRate * elapsed;
             pitch += pitchRate * elapsed;
-
+			
+			for(var i = 0; i < objects.length; i++)
+			{
+				objects[i].animate(elapsed);
+			}
         }
         lastTime = timeNow;
     }
