@@ -4,6 +4,7 @@
 <title>Virtual File Navigator</title>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<link rel="stylesheet" type="text/css" href="css/index.css">
 <script type="text/javascript" src="js/gl-matrix-min.js"></script>
 <script type="text/javascript" src="js/webgl-utils.js"></script>
 <script type="text/javascript" src="js/RectPrism.js"></script>
@@ -42,17 +43,36 @@
     var gl;
 
     function initGL(canvas) {
-        try {
+        try
+		{
             gl = canvas.getContext("experimental-webgl");
             gl.viewportWidth = canvas.width;
             gl.viewportHeight = canvas.height;
-        } catch (e) {
-        }
-        if (!gl) {
+			
+			window.addEventListener('resize', resizeCanvas, false);
+			resizeCanvas();
+        } 
+		catch (e) 
+		{
+			console.error("Unable to find canvas");
+		}
+        
+		if (!gl) 
+		{
             alert("Could not initialise WebGL, sorry :-(");
         }
     }
 
+	function resizeCanvas()
+	{
+		var canvas = document.getElementById("lesson10-canvas");
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+		
+		gl.viewportWidth = window.innerWidth;
+		gl.viewportHeight = window.innerHeight;
+	}
+	
     function getShader(gl, id) {
         var shaderScript = document.getElementById(id);
         if (!shaderScript) {
@@ -387,7 +407,8 @@
 
     var lastTime = 0;
 
-    function animate() {
+    function animate() 
+	{
         var timeNow = new Date().getTime();
 		
         if (lastTime != 0) 
@@ -422,7 +443,9 @@
     }
 
     function webGLStart() {
-	
+		
+		//Initialize the logging system
+		
 		// create a noop console object if the browser doesn't provide one ...
 		if (!window.console)
 		{
@@ -463,8 +486,37 @@
 
         document.onkeydown = handleKeyDown;
         document.onkeyup = handleKeyUp;
-
+		
+		document.onmousemove = handleMouseMove;
+		
         tick();
+    }
+	
+	var lastMouseX;
+	var lastMouseY;
+	
+	function handleMouseMove(event) 
+	{
+		var newX = event.clientX;
+		var newY = event.clientY;
+		var deltaX = newX - lastMouseX;
+		var deltaY = newY - lastMouseY;
+		
+		console.debug("X: " + newX);
+		console.debug("Y: " + newY);
+		console.debug("dX: " + deltaX/10);
+		console.debug("dY: " + deltaY/10);
+		
+		console.debug("dX math: " + parseFloat(parseFloat(yaw) - parseFloat(deltaX/10)));
+		console.debug("dY math: " + parseFloat(parseFloat(pitch) - parseFloat(deltaY/10)));
+		console.debug("Yaw: " + yaw);
+		console.debug("Pitch: " + pitch);
+		
+		//yaw = parseFloat(parseFloat(yaw) - parseFloat(deltaX/10));
+		//pitch = parseFloat(parseFloat(pitch) - parseFloat(deltaY/10));
+		
+		lastMouseX = newX
+		lastMouseY = newY;
     }
 
 </script>
@@ -486,12 +538,10 @@
 
 <body onload="webGLStart();">
 	<center>
-    <canvas id="lesson10-canvas" style="border: none;" width="800" height="700"></canvas>
+    <canvas id="lesson10-canvas" style="border: none;"></canvas>
 	<center>
     <div id="loadingtext">Loading world...</div>
-
-    <br/>
-    Use the cursor keys or WASD to run around, and Arrow keys to look. Press enter to start an animation cycle.
 </body>
 
 </html>
+w
