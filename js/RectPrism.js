@@ -17,6 +17,7 @@
 		this.targetY = y;
 		this.targetZ = z;
 		this.motionTime = 0;
+		this.completedTime = 0;
 		
 		this.w = width / 2;
 		this.h = height / 2;
@@ -140,21 +141,32 @@
 	}
 	
 	RectPrism.prototype.animate = function(elapsed) 
-	{		
+	{			
 		//elapsed should be a JavaScript DateTime object from the Animate loop
 		//Elapsed is the time between calls to animate
-		if(this.needsAnimating)
+		if((this.x != this.targetX || this.y != this.targetY || this.z != this.targetZ) && this.motionTime > 0 && this.completedTime < this.motionTime)
 		{
-			//Move points to correct locations but DO NOT REDRAW
-		}
+			//Move points to correct locations and fill the framebuffers for the next scene
+			
+			//Need to change this motion algorithm: currently approaches the target point asymptotically which isn't what I want.
+			//Could do this like I did at work by creating "motion control" objects that just move numbers from point A to point B following a model
+			this.x += (this.targetX - this.x) * (elapsed / this.motionTime);
+			this.y += (this.targetY - this.y) * (elapsed / this.motionTime);
+			this.z += (this.targetY - this.z) * (elapsed / this.motionTime);			
+			this.completedTime += elapsed;
+			
+			this.fillBuffers();
+		}		
 	}
 	
 	RectPrism.prototype.requestMove = function(x, y, z, time)
 	{
+		console.debug("Move request");
 		this.targetX = x;
 		this.targetY = y;
 		this.targetZ = z;
 		this.motionTime = time;
+		this.completedTime = 0;
 	}
 	
 	RectPrism.prototype.draw = function()
