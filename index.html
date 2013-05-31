@@ -8,6 +8,7 @@
 <script type="text/javascript" src="js/gl-matrix-min.js"></script>
 <script type="text/javascript" src="js/webgl-utils.js"></script>
 <script type="text/javascript" src="js/RectPrism.js"></script>
+<script type="text/javascript" src="js/Animator.js"></script>
 
 <script id="shader-fs" type="x-shader/x-fragment">
     precision mediump float;
@@ -325,6 +326,7 @@
     }
 	
 	var objects = [];
+	var animator = new Animator();
 	
 	function createFileVertexes(data)
 	{
@@ -332,11 +334,18 @@
         for (var i in lines) 
 		{
             var vals = lines[i].replace(/^\s+/, "").split(/\s+/);
-            if (vals.length == 3 && vals[0] != "//") 
+            if (vals.length == 6 && vals[0] != "//") 
 			{				
-				objects.push(new RectPrism(1.0, 0.2, 1.0, parseFloat(vals[0]), parseFloat(vals[2]), parseFloat(vals[1]), fileTexture));
+				objects.push(new RectPrism(parseFloat(vals[3]), parseFloat(vals[4]), parseFloat(vals[5]), parseFloat(vals[0]), parseFloat(vals[2]), parseFloat(vals[1]), fileTexture));
             }
+			else if (vals.length == 9 && vals[0] != "//")
+			{
+				//Placeholder for animation information
+			}
         }
+		
+		//testing: the floating block will fly away when approached
+		animator.registerObject(objects[0], 2, 10, 10, 10, 3000);
 	}
 
     function loadWorld() 
@@ -426,8 +435,10 @@
             yaw += yawRate * elapsed;
             pitch += pitchRate * elapsed;
 			
+			animator.update(xPos, yPos, zPos);
+			
 			for(var i = 0; i < objects.length; i++)
-			{
+			{		
 				objects[i].animate(elapsed);
 			}
         }
@@ -497,6 +508,7 @@
 	
 	function handleMouseMove(event) 
 	{
+		/*
 		var newX = event.clientX;
 		var newY = event.clientY;
 		var deltaX = newX - lastMouseX;
@@ -516,7 +528,8 @@
 		//pitch = parseFloat(parseFloat(pitch) - parseFloat(deltaY/10));
 		
 		lastMouseX = newX
-		lastMouseY = newY;
+		lastMouseY = newY; 
+		*/
     }
 
 </script>
@@ -544,4 +557,3 @@
 </body>
 
 </html>
-w

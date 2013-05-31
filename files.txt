@@ -1,4 +1,14 @@
--5.0 3.0 0.0
-1.0 0.0 0.0
-0.0 0.0 12.0
-0.0 0.0 3.0
+// The link entry below is for linking animation together: for example,
+// if you have 6 objects making up one larger object you might want them to all move at once:
+// if the user enters the range of ANY of those objects, it triggers all of them
+// Not implemented yet though, neither is animationx, animationy, animationz, and range
+
+
+// x   z   y     w   h   d    ax   ay   az   range   link
+-5.0 3.0 0.0    1.0 0.5 1.0
+ 1.0 0.0 0.0    1.0 0.5 1.0
+ 0.0 0.0 12.0   1.0 0.5 1.0
+ 0.0 0.0 3.0    1.0 0.5 1.0
+ 
+ 
+ 
